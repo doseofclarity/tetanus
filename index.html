@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetanus Study Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; }
+        
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .group:hover .group-hover\:rotate-y-180 { transform: rotateY(180deg); }
+        
+        .recall-mode .reveal-text {
+            background-color: #cbd5e1; /* Slate-300 */
+            color: transparent;
+            border-radius: 4px;
+            padding: 0 6px;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.3s, color 0.3s;
+            text-shadow: none;
+            box-shadow: inset 0 0 0 1px #94a3b8;
+        }
+        .recall-mode .reveal-text:hover, .recall-mode .reveal-text.revealed {
+            background-color: #fde047; /* Yellow-300 */
+            color: #1e293b; /* Slate-800 */
+            box-shadow: none;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(217, 119, 6, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(180, 83, 9, 0.8); }
+
+        .content-section { animation: fadeIn 0.4s ease-in-out; }
+        .locked-section { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        theme: {
+                            light: '#fffbeb', /* Amber-50 */
+                            DEFAULT: '#d97706', /* Amber-600 */
+                            dark: '#78350f', /* Amber-900 */
+                            accent: '#ef4444', /* Red-500 */
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 h-screen flex flex-col md:flex-row font-sans text-slate-800 overflow-hidden">
+
+    <!-- Mobile Header -->
+    <div class="md:hidden bg-theme-dark text-white p-4 flex justify-between items-center shadow-md z-20 shrink-0">
+        <h1 class="font-bold text-lg"><i class="fa-solid fa-bacterium mr-2 text-theme-accent"></i> Tetanus (Lockjaw)</h1>
+        <button onclick="toggleMobileMenu()" class="text-white focus:outline-none">
+            <i class="fa-solid fa-bars text-2xl"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar -->
+    <nav id="sidebar" class="hidden md:flex flex-col w-full md:w-72 bg-white shadow-2xl h-full absolute md:relative z-30 transition-transform duration-300 shrink-0 border-r border-slate-200">
+        <div class="p-6 bg-gradient-to-br from-slate-900 to-theme-dark text-white hidden md:block shrink-0">
+            <h1 class="font-black text-2xl tracking-wide"><i class="fa-solid fa-bacterium text-theme-accent mr-2"></i> PHN Review</h1>
+            <p class="text-sm text-amber-100 mt-1 font-medium">Tetanus Module</p>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1 text-sm font-medium">
+                <li><button onclick="showSection('home')" id="btn-home" class="nav-btn w-full text-left px-6 py-3 bg-theme-light text-theme-dark border-r-4 border-theme-dark transition-colors"><i class="fa-solid fa-house w-6 nav-icon"></i><i class="fa-solid fa-lock w-6 hidden text-slate-400"></i> Module Overview</button></li>
+                <li><button onclick="showSection('intro')" id="btn-intro" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-microscope w-6 nav-icon hidden text-amber-600"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Agent & Transmission</button></li>
+                <li><button onclick="showSection('clinical')" id="btn-clinical" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-face-grimace w-6 nav-icon hidden text-orange-500"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Clinical Manifestations</button></li>
+                <li><button onclick="showSection('complications')" id="btn-complications" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-triangle-exclamation w-6 nav-icon hidden text-red-600"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Complications</button></li>
+                <li><button onclick="showSection('prevention')" id="btn-prevention" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-syringe w-6 nav-icon hidden text-teal-600"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Prevention & Nursing Care</button></li>
+                <li><button onclick="showSection('final_quiz_sec')" id="btn-final_quiz_sec" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors border-t border-slate-200 mt-2 locked-section"><i class="fa-solid fa-trophy w-6 text-amber-500 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Final Checkpoint</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 h-full overflow-y-auto bg-slate-100 relative w-full">
+        
+        <!-- Floating Active Recall Toggle -->
+        <div class="fixed top-4 right-4 md:right-8 z-40 flex items-center bg-white/90 backdrop-blur px-4 py-3 rounded-full shadow-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors" onclick="toggleRecallMode()">
+            <span class="mr-3 text-sm font-bold text-slate-700 hidden md:inline"><i class="fa-solid fa-brain text-theme-accent mr-1"></i> Active Recall</span>
+            <span class="mr-3 text-sm font-bold text-slate-700 md:hidden"><i class="fa-solid fa-brain text-theme-accent"></i></span>
+            <button id="recall-toggle" class="w-12 h-6 bg-slate-300 rounded-full relative transition-colors duration-300 focus:outline-none shadow-inner pointer-events-none">
+                <div id="recall-knob" class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform duration-300 shadow"></div>
+            </button>
+        </div>
+
+        <div class="p-4 md:p-8 max-w-6xl mx-auto pb-32">
+
+            <!-- OVERVIEW SECTION -->
+            <section id="home" class="content-section flex flex-col items-center justify-center min-h-[80vh] text-center block">
+                <div class="bg-gradient-to-br from-slate-900 via-theme-dark to-amber-800 text-white rounded-3xl shadow-2xl p-10 md:p-16 w-full relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 text-white opacity-5 pointer-events-none">
+                        <i class="fa-solid fa-skull-crossbones text-[20rem]"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="bg-white/10 backdrop-blur-sm inline-block p-4 rounded-full text-theme-accent mb-6 shadow-sm border border-white/20">
+                            <i class="fa-solid fa-bacterium text-5xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-amber-200 mb-2 uppercase tracking-widest">Communicable Diseases</h3>
+                        <h1 class="text-5xl md:text-7xl font-black text-white mb-6 leading-tight drop-shadow-md">
+                            Tetanus<br/><span class="text-3xl md:text-5xl text-amber-300">(Lockjaw)</span>
+                        </h1>
+                        <div class="bg-white/10 backdrop-blur inline-block px-6 py-3 rounded-full mb-10 border border-white/20">
+                            <p class="text-lg text-white font-medium">"The Silent Spore. The Deadly Spasm."</p>
+                        </div>
+                        <br/>
+                        <button onclick="unlockFirstSection()" class="bg-theme-accent hover:bg-red-400 text-white font-black py-4 px-10 rounded-full shadow-xl transition-transform hover:scale-105 text-lg flex items-center mx-auto focus:outline-none">
+                            Start Module <i class="fa-solid fa-arrow-right ml-3"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AGENT & TRANSMISSION -->
+            <section id="intro" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 flex items-center border-b-2 border-amber-500 pb-3">
+                        <i class="fa-solid fa-microscope text-amber-500 mr-4"></i> Agent & Transmission
+                    </h2>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-amber-50 border border-amber-100 p-5 rounded-xl shadow-sm">
+                            <h3 class="text-xl font-bold text-amber-900 mb-3 border-b border-amber-200 pb-2">The Agent</h3>
+                            <ul class="space-y-3 text-slate-700 font-medium">
+                                <li><i class="fa-solid fa-bug text-amber-500 mr-2"></i> <strong>Pathogen:</strong> <span class="reveal-text font-bold text-amber-700">Clostridium tetani</span></li>
+                                <li><i class="fa-solid fa-shield-virus text-amber-500 mr-2"></i> <strong>Characteristics:</strong> Gram-positive, spore-forming bacillus. It is strictly <span class="reveal-text font-bold text-red-600">Anaerobic</span> (thrives in environments without oxygen).</li>
+                                <li><i class="fa-solid fa-flask-vial text-amber-500 mr-2"></i> <strong>The Toxin:</strong> The bacteria itself doesn't cause the spasms; it releases a deadly neurotoxin called <span class="reveal-text font-bold text-amber-700">Tetanospasmin</span>.</li>
+                                <li><i class="fa-solid fa-clock text-amber-500 mr-2"></i> <strong>Incubation Period:</strong> Usually <span class="reveal-text font-bold">3 to 21 days</span> (average 8 days). The further the wound is from the CNS, the longer the incubation.</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-slate-50 border border-slate-200 p-5 rounded-xl shadow-sm flex flex-col justify-center">
+                            <h3 class="text-xl font-bold text-slate-800 mb-3 border-b border-slate-200 pb-2">Transmission Dynamics</h3>
+                            <p class="text-slate-700 mb-3">Tetanus is <span class="reveal-text font-bold text-red-600 underline">NOT</span> transmitted from person to person. It is acquired through environmental exposure.</p>
+                            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-inner space-y-2">
+                                <p class="text-sm font-bold text-theme-dark"><i class="fa-solid fa-shoe-prints mr-1"></i> Environmental Spores</p>
+                                <p class="text-xs text-slate-600">Spores are ubiquitous in soil, dust, and animal/human feces. They are highly resilient and can survive for years.</p>
+                            </div>
+                            <div class="bg-white p-3 mt-2 rounded-lg border border-slate-200 shadow-inner space-y-2">
+                                <p class="text-sm font-bold text-theme-dark"><i class="fa-solid fa-staff-snake mr-1"></i> Mode of Entry</p>
+                                <p class="text-xs text-slate-600">Spores enter the body through breaks in the skin, especially <span class="reveal-text font-bold">deep puncture wounds</span>, burns, crush injuries, or unhygienic cutting of the umbilical cord (<span class="reveal-text font-bold text-amber-700">Neonatal Tetanus</span>).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="openQuiz('intro')" class="w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors flex items-center justify-center text-lg"><i class="fa-solid fa-list-check mr-3 text-2xl text-theme-accent"></i> Take Quiz to Unlock Next Section</button>
+                </div>
+            </section>
+
+            <!-- CLINICAL MANIFESTATIONS -->
+            <section id="clinical" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 flex items-center border-b-2 border-orange-500 pb-3">
+                        <i class="fa-solid fa-face-grimace text-orange-500 mr-4"></i> Clinical Manifestations
+                    </h2>
+
+                    <p class="text-lg text-slate-600 mb-6 font-medium">Tetanospasmin blocks inhibitory neurotransmitters in the central nervous system, leading to sustained, severe muscle contractions (spasms) that progress in a <span class="reveal-text font-bold">descending pattern</span> (jaw &rarr; face &rarr; neck &rarr; trunk &rarr; extremities).</p>
+
+                    <div class="space-y-6 mb-10">
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <!-- Trismus -->
+                            <div class="bg-orange-50 border border-orange-200 rounded-xl p-5 shadow-sm">
+                                <div class="text-orange-500 mb-3"><i class="fa-solid fa-tooth text-4xl"></i></div>
+                                <h3 class="text-lg font-black text-orange-900 mb-1">1. Trismus</h3>
+                                <p class="text-sm font-bold text-slate-800 mb-2 border-b border-orange-200 pb-1">"Lockjaw"</p>
+                                <p class="text-xs text-slate-700 leading-relaxed">
+                                    Usually the <span class="reveal-text font-bold">first sign</span>. Spasm of the masseter muscles makes it difficult or impossible for the patient to open their mouth or chew.
+                                </p>
+                            </div>
+
+                            <!-- Risus Sardonicus -->
+                            <div class="bg-amber-50 border border-amber-200 rounded-xl p-5 shadow-sm">
+                                <div class="text-amber-500 mb-3"><i class="fa-regular fa-face-smile-beam text-4xl"></i></div>
+                                <h3 class="text-lg font-black text-amber-900 mb-1">2. Risus Sardonicus</h3>
+                                <p class="text-sm font-bold text-slate-800 mb-2 border-b border-amber-200 pb-1">"Sardonic Smile"</p>
+                                <p class="text-xs text-slate-700 leading-relaxed">
+                                    Sustained spasm of the facial muscles produces a grotesque, fixed, grinning expression with raised eyebrows.
+                                </p>
+                            </div>
+
+                            <!-- Opisthotonos -->
+                            <div class="bg-red-50 border border-red-200 rounded-xl p-5 shadow-sm">
+                                <div class="text-red-500 mb-3"><i class="fa-solid fa-person-falling text-4xl transform -rotate-90"></i></div>
+                                <h3 class="text-lg font-black text-red-900 mb-1">3. Opisthotonos</h3>
+                                <p class="text-sm font-bold text-slate-800 mb-2 border-b border-red-200 pb-1">Severe Back Arching</p>
+                                <p class="text-xs text-slate-700 leading-relaxed">
+                                    A profound, rigid spasm of the extensor muscles of the neck and back. The body arches backward so intensely that only the head and heels touch the bed.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800 text-white border-l-4 border-theme-accent rounded-r-xl p-5 shadow-md">
+                            <h3 class="text-xl font-black text-theme-accent mb-2"><i class="fa-solid fa-bolt mr-2"></i> The Nature of the Spasms</h3>
+                            <p class="text-sm text-slate-300">
+                                The muscle spasms are excruciatingly painful. Crucially, they are triggered by <span class="reveal-text font-bold text-white px-1">sensory stimuli</span>. Minor disturbances—such as a sudden noise, bright light, a draft of air, or even light touch—can precipitate generalized, violent convulsions. The patient remains fully conscious during these spasms.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Mnemonic Flip Card -->
+                    <div class="group h-40 w-full md:w-2/3 mx-auto cursor-pointer perspective-1000 mb-8">
+                        <div class="relative h-full w-full transition-all duration-500 transform-style-3d group-hover:rotate-y-180">
+                            <div class="absolute h-full w-full bg-slate-50 border-2 border-slate-300 rounded-xl shadow-md flex flex-col items-center justify-center backface-hidden">
+                                <p class="text-sm font-bold text-slate-600 uppercase tracking-widest mb-1"><i class="fa-solid fa-lightbulb mr-2"></i> The Classic Triad</p>
+                                <h3 class="text-4xl font-black text-theme-dark tracking-widest mt-2">T. R. O.</h3>
+                                <p class="text-xs text-slate-500 mt-3 animate-pulse">(Hover or Tap to Flip)</p>
+                            </div>
+                            <div class="absolute h-full w-full bg-theme-dark text-white rounded-xl shadow-lg flex flex-col items-center justify-center p-4 text-center backface-hidden rotate-y-180">
+                                <p class="font-bold text-xl leading-relaxed">
+                                    <span class="text-theme-accent font-black">T</span>rismus (Lockjaw)<br>
+                                    <span class="text-theme-accent font-black">R</span>isus Sardonicus (Grin)<br>
+                                    <span class="text-theme-accent font-black">O</span>pisthotonos (Back arch)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="openQuiz('clinical')" class="w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors flex items-center justify-center text-lg"><i class="fa-solid fa-list-check mr-3 text-2xl text-theme-accent"></i> Take Quiz to Unlock Next Section</button>
+                </div>
+            </section>
+
+            <!-- COMPLICATIONS -->
+            <section id="complications" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 flex items-center border-b-2 border-red-600 pb-3">
+                        <i class="fa-solid fa-triangle-exclamation text-red-600 mr-4"></i> Tetanus Complications
+                    </h2>
+
+                    <p class="text-lg text-slate-700 mb-6 font-medium">Without medical intervention, the fatality rate of generalized tetanus is incredibly high. Complications arise primarily from the physical force of the spasms and the neurotoxin's effect on the nervous system.</p>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-red-50 p-5 rounded-xl border border-red-300 shadow-md">
+                            <div class="text-red-600 mb-3"><i class="fa-solid fa-lungs text-4xl"></i></div>
+                            <h3 class="font-bold text-red-900 mb-1">Leading Cause of Death</h3>
+                            <p class="text-2xl font-black text-slate-800 mb-2"><span class="reveal-text text-red-700">Respiratory Failure</span></p>
+                            <p class="text-sm text-slate-700 font-medium">Spasms can affect the vocal cords (laryngospasm) and the respiratory muscles (diaphragm and intercostals), leading to asphyxiation. Aspiration pneumonia is also highly common due to inability to swallow.</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-300 shadow-sm flex items-start">
+                                <i class="fa-solid fa-bone text-2xl text-slate-500 mr-4 mt-1"></i>
+                                <div>
+                                    <h3 class="font-bold text-slate-800 mb-1">Bone Fractures</h3>
+                                    <p class="text-xs text-slate-700">The muscle contractions are so violent that they can literally tear muscles and cause compression fractures of the spine and long bones.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-300 shadow-sm flex items-start">
+                                <i class="fa-solid fa-heart-pulse text-2xl text-slate-500 mr-4 mt-1"></i>
+                                <div>
+                                    <h3 class="font-bold text-slate-800 mb-1">Autonomic Dysfunction</h3>
+                                    <p class="text-xs text-slate-700">In severe cases, the neurotoxin affects the autonomic nervous system causing extreme fluctuations in blood pressure, profuse sweating, and cardiac arrhythmias.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="openQuiz('complications')" class="w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors flex items-center justify-center text-lg"><i class="fa-solid fa-list-check mr-3 text-2xl text-theme-accent"></i> Take Quiz to Unlock Next Section</button>
+                </div>
+            </section>
+
+            <!-- PREVENTION & NURSING CARE -->
+            <section id="prevention" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 flex items-center border-b-2 border-teal-600 pb-3">
+                        <i class="fa-solid fa-syringe text-teal-600 mr-4"></i> Prevention & Nursing Care
+                    </h2>
+
+                    <!-- Prevention: TT Schedule -->
+                    <div class="bg-teal-50 rounded-xl p-6 border border-teal-200 mb-8 shadow-sm">
+                        <h3 class="text-2xl font-black text-teal-900 mb-4 flex items-center"><i class="fa-solid fa-person-pregnant mr-2 text-teal-700"></i> Maternal Tetanus Toxoid (TT) Schedule</h3>
+                        <p class="text-sm text-slate-700 mb-4">A critical PHN role is immunizing pregnant women to prevent Maternal and Neonatal Tetanus. The vaccine creates antibodies that cross the placenta.</p>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm border-collapse">
+                                <thead>
+                                    <tr class="bg-teal-700 text-white">
+                                        <th class="p-3 font-bold rounded-tl-lg">Dose</th>
+                                        <th class="p-3 font-bold">When to give</th>
+                                        <th class="p-3 font-bold rounded-tr-lg">% Protection & Duration</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-teal-200 bg-white text-slate-800">
+                                    <tr class="hover:bg-teal-50/50">
+                                        <td class="p-3 font-bold">TT 1</td>
+                                        <td class="p-3">As early as possible in pregnancy</td>
+                                        <td class="p-3 text-slate-500 italic">No protection yet</td>
+                                    </tr>
+                                    <tr class="hover:bg-teal-50/50">
+                                        <td class="p-3 font-bold text-teal-700">TT 2</td>
+                                        <td class="p-3">At least <span class="reveal-text font-bold text-red-600">4 weeks</span> after TT 1</td>
+                                        <td class="p-3"><span class="reveal-text font-bold">80%</span> protection (lasts 3 years)</td>
+                                    </tr>
+                                    <tr class="hover:bg-teal-50/50">
+                                        <td class="p-3 font-bold">TT 3</td>
+                                        <td class="p-3">At least <span class="reveal-text font-bold text-red-600">6 months</span> after TT 2</td>
+                                        <td class="p-3"><span class="reveal-text font-bold">95%</span> protection (lasts 5 years)</td>
+                                    </tr>
+                                    <tr class="hover:bg-teal-50/50">
+                                        <td class="p-3 font-bold">TT 4</td>
+                                        <td class="p-3">At least <span class="reveal-text font-bold text-red-600">1 year</span> after TT 3</td>
+                                        <td class="p-3"><span class="reveal-text font-bold">99%</span> protection (lasts 10 years)</td>
+                                    </tr>
+                                    <tr class="hover:bg-teal-50/50">
+                                        <td class="p-3 font-bold text-teal-700">TT 5</td>
+                                        <td class="p-3">At least <span class="reveal-text font-bold text-red-600">1 year</span> after TT 4</td>
+                                        <td class="p-3"><span class="reveal-text font-bold">99%</span> protection (lasts <span class="reveal-text font-bold text-teal-700">Lifetime</span>)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Nursing Care & Management -->
+                    <h3 class="text-2xl font-black text-slate-800 mb-4 flex items-center"><i class="fa-solid fa-user-nurse text-blue-600 mr-2"></i> Clinical Nursing Management</h3>
+                    
+                    <div class="space-y-4">
+                        <!-- Environment -->
+                        <div class="border-l-4 border-slate-800 bg-slate-50 p-4 rounded-r-lg shadow-sm">
+                            <h4 class="font-bold text-slate-900 text-lg mb-1">1. Environmental Control (Crucial Priority)</h4>
+                            <p class="text-sm text-slate-700">Because spasms are triggered by sensory stimuli, the patient must be placed in a <span class="reveal-text font-bold text-red-600">dark, completely quiet room</span>. Group nursing interventions to minimize touching and disturbing the patient.</p>
+                        </div>
+
+                        <!-- Medical interventions -->
+                        <div class="border-l-4 border-blue-500 bg-slate-50 p-4 rounded-r-lg shadow-sm">
+                            <h4 class="font-bold text-blue-800 text-lg mb-1">2. Medical Countermeasures</h4>
+                            <ul class="text-sm text-slate-700 list-disc pl-5 space-y-1">
+                                <li><strong>Neutralize Toxin:</strong> Administer <span class="reveal-text font-bold">Tetanus Immune Globulin (TIG)</span> or Antitoxin. (Note: This only neutralizes *unbound* toxin circulating in blood; it cannot unbind toxin already attached to nerve endings).</li>
+                                <li><strong>Antibiotics:</strong> Metronidazole or Penicillin to destroy the *C. tetani* bacteria and stop further toxin production.</li>
+                                <li><strong>Muscle Relaxants:</strong> Diazepam (Valium) or other sedatives to control severe spasms and induce relaxation.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Airway -->
+                        <div class="border-l-4 border-red-500 bg-slate-50 p-4 rounded-r-lg shadow-sm">
+                            <h4 class="font-bold text-red-800 text-lg mb-1">3. Airway Management</h4>
+                            <p class="text-sm text-slate-700">Maintain a patent airway. Keep an emergency tracheostomy tray and suction equipment readily available at the bedside due to the high risk of laryngospasm and respiratory failure.</p>
+                        </div>
+                    </div>
+
+                    <button onclick="openQuiz('prevention')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors flex items-center justify-center text-lg"><i class="fa-solid fa-list-check mr-3 text-2xl text-theme-accent"></i> Take Quiz to Unlock Final Checkpoint</button>
+                </div>
+            </section>
+
+            <!-- FINAL QUIZ SECTION -->
+            <section id="final_quiz_sec" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 md:p-8 text-center min-h-[60vh] flex flex-col justify-center items-center">
+                    <i class="fa-solid fa-graduation-cap text-8xl text-amber-500 mb-6 drop-shadow-md"></i>
+                    <h2 class="text-4xl font-black text-slate-800 mb-4">Module Complete</h2>
+                    <p class="text-lg text-slate-600 mb-8 max-w-2xl">You have reviewed all the material regarding Tetanus (Lockjaw). Take this final 50-item comprehensive checkpoint to ensure you've mastered the clinical concepts for the boards.</p>
+                    <button onclick="openQuiz('final_quiz')" class="w-full max-w-md bg-theme-dark text-white font-black py-4 rounded-xl shadow-md hover:bg-amber-800 transition-colors text-xl"><i class="fa-solid fa-flag-checkered mr-2"></i> Start Final Checkpoint</button>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto">
+             <button onclick="closeQuiz()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors focus:outline-none"><i class="fa-solid fa-xmark text-2xl"></i></button>
+             <h2 id="quiz-title" class="text-3xl font-black text-slate-800 mb-2"></h2>
+             <p class="text-slate-600 mb-6 font-medium border-b border-slate-200 pb-4">You must score at least <span class="font-bold text-amber-600">80%</span> to proceed.</p>
+             <div id="quiz-questions-container" class="space-y-6"></div>
+             <button id="quiz-submit-btn" onclick="submitQuiz()" class="mt-8 w-full bg-amber-600 text-white font-bold py-4 rounded-xl hover:bg-amber-700 transition-colors shadow-lg text-lg">Submit Answers</button>
+             <div id="quiz-result-container" class="hidden mt-6 text-center"></div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let unlockedSections = ['home'];
+
+        // Quiz Data
+        const quizzes = {
+            'intro': {
+                title: 'Agent & Transmission Check',
+                next: 'clinical',
+                questions: [
+                    { q: "What is the causative agent of Tetanus?", options: ["Mycobacterium tetani", "Clostridium perfringens", "Clostridium tetani", "Staphylococcus aureus"], ans: 2 },
+                    { q: "Which characteristic correctly describes Clostridium tetani?", options: ["It requires high oxygen levels to survive", "It is transmitted via aerosolized respiratory droplets", "It is an anaerobic, spore-forming bacillus", "It is a virus found in rusty metal"], ans: 2 },
+                    { q: "What specifically causes the severe muscle spasms in a tetanus infection?", options: ["The bacteria physically invading muscle tissue", "A neurotoxin called Tetanospasmin", "The body's autoimmune response to the wound", "High fever causing febrile seizures"], ans: 1 },
+                    { q: "How is Tetanus primarily transmitted?", options: ["Direct contact with an infected person's saliva", "Airborne droplets from coughing", "Spores entering through a break in the skin or deep puncture wound", "Consuming contaminated food"], ans: 2 },
+                    { q: "Why are deep puncture wounds particularly high-risk for tetanus?", options: ["They bleed profusely", "They create an anaerobic (oxygen-free) environment ideal for the bacteria", "They heal too quickly", "They attract more dust and dirt"], ans: 1 },
+                    { q: "What is the average incubation period for tetanus?", options: ["1 to 2 days", "3 to 21 days (average 8 days)", "1 to 2 months", "6 months"], ans: 1 },
+                    { q: "Can tetanus be transmitted from person to person?", options: ["Yes, via direct contact", "Yes, via airborne transmission", "No, it is strictly environmental", "Yes, via bodily fluids"], ans: 2 },
+                    { q: "Which form of the bacteria is highly resilient and survives for years in the soil?", options: ["Vegetative cells", "Endotoxins", "Spores", "Macromolecules"], ans: 2 },
+                    { q: "Neonatal tetanus is most commonly caused by:", options: ["Genetic inheritance", "Unhygienic cutting of the umbilical cord", "Breastfeeding from an infected mother", "Airborne hospital exposure"], ans: 1 },
+                    { q: "How does the distance of the wound from the Central Nervous System (CNS) affect the incubation period?", options: ["The further the wound, the longer the incubation", "The further the wound, the shorter the incubation", "Distance has no effect on incubation", "Wounds on the extremities have a 1-day incubation"], ans: 0 }
+                ]
+            },
+            'clinical': {
+                title: 'Clinical Manifestations Check',
+                next: 'complications',
+                questions: [
+                    { q: "What is usually the FIRST clinical sign of generalized tetanus?", options: ["Opisthotonos", "Trismus (Lockjaw)", "High fever", "Risus sardonicus"], ans: 1 },
+                    { q: "What term describes the severe, rigid backward arching of the back and neck?", options: ["Trismus", "Kyphosis", "Opisthotonos", "Lordosis"], ans: 2 },
+                    { q: "Which of the following describes 'Risus sardonicus'?", options: ["A fixed, grinning expression caused by facial muscle spasms", "Inability to open the jaw", "Spasm of the vocal cords", "Arching of the spine"], ans: 0 },
+                    { q: "How do the muscle spasms in tetanus typically progress?", options: ["Ascending pattern (feet to head)", "Descending pattern (jaw/face down to trunk/extremities)", "Randomly across the body", "Only affecting the injured limb"], ans: 1 },
+                    { q: "What is a critical characteristic of tetanus spasms that nurses must be aware of?", options: ["They only occur during sleep", "They are painless", "They are triggered by sensory stimuli like noise, light, or touch", "They cause loss of consciousness"], ans: 2 },
+                    { q: "Does the patient lose consciousness during generalized tetanus convulsions?", options: ["Yes, immediately", "No, the patient remains fully conscious", "Yes, due to high fever", "Only if the bacteria enters the brain"], ans: 1 },
+                    { q: "Which specific muscle group is affected by 'Trismus'?", options: ["Biceps", "Diaphragm", "Masseter muscles", "Intercostals"], ans: 2 },
+                    { q: "Tetanospasmin causes severe spasms by blocking which of the following?", options: ["Excitatory neurotransmitters", "Inhibitory neurotransmitters", "Red blood cell production", "Insulin receptors"], ans: 1 },
+                    { q: "Which of the following minor disturbances can precipitate a violent tetanic convulsion?", options: ["A sudden noise", "A bright light", "A draft of air", "All of the above"], ans: 3 },
+                    { q: "What constitutes the classic triad of generalized tetanus?", options: ["Fever, Cough, Coryza", "Trismus, Risus Sardonicus, Opisthotonos", "Headache, Nuchal rigidity, Photophobia", "Hypotension, Tachycardia, Tachypnea"], ans: 1 }
+                ]
+            },
+            'complications': {
+                title: 'Complications Check',
+                next: 'prevention',
+                questions: [
+                    { q: "What is the leading cause of death in patients with generalized tetanus?", options: ["Cardiac arrest", "Respiratory failure / Asphyxiation", "Septic shock", "Kidney failure"], ans: 1 },
+                    { q: "Why are bone fractures a known complication of tetanus?", options: ["The bacteria weakens the bone marrow", "Patients fall out of bed frequently", "The muscle contractions are so violent they can break bones", "The antitoxin medication causes osteoporosis"], ans: 2 },
+                    { q: "Laryngospasm, a severe complication, directly affects the patient's ability to:", options: ["Digest food", "See clearly", "Breathe", "Control blood pressure"], ans: 2 },
+                    { q: "Which of the following is a sign of autonomic dysfunction in severe tetanus?", options: ["Extreme fluctuations in blood pressure and profuse sweating", "Complete paralysis of the legs", "Loss of memory", "Development of a rash"], ans: 0 },
+                    { q: "Aspiration pneumonia is common in tetanus patients primarily because:", options: ["The bacteria travels to the lungs", "Spasms of the jaw and neck make swallowing difficult or impossible", "They are kept in a dark room", "The immune system is completely destroyed"], ans: 1 },
+                    { q: "Which major respiratory muscle is heavily affected by tetanic spasms, contributing to asphyxiation?", options: ["Sternocleidomastoid", "Diaphragm", "Trapezius", "Pectoralis major"], ans: 1 },
+                    { q: "Cardiac arrhythmias in severe tetanus patients are most commonly a result of:", options: ["Autonomic nervous system dysfunction", "Direct bacterial infection of the heart", "Dehydration", "Bone fractures"], ans: 0 },
+                    { q: "Without medical intervention, what is the expected outcome of generalized tetanus?", options: ["Spontaneous recovery in 7 days", "Mild chronic muscle twitching", "An incredibly high fatality rate", "Development of lifelong immunity"], ans: 2 },
+                    { q: "In addition to the spine, which type of bones are particularly susceptible to compression fractures during a severe spasm?", options: ["Cranial bones", "Long bones", "Facial bones", "Carpal bones"], ans: 1 },
+                    { q: "Tetanospasmin's primary effect on the central nervous system causes complications related mostly to:", options: ["Fluid overload", "Physical force of spasms and autonomic instability", "Severe internal bleeding", "Autoimmune destruction of tissues"], ans: 1 }
+                ]
+            },
+            'prevention': {
+                title: 'Prevention & Nursing Care Check',
+                next: 'final_quiz_sec',
+                questions: [
+                    { q: "According to the maternal TT schedule, when should TT 2 be given?", options: ["At the time of delivery", "At least 4 weeks after TT 1", "6 months after TT 1", "1 year after TT 1"], ans: 1 },
+                    { q: "What duration of protection does TT 5 provide if the schedule is completed?", options: ["3 years", "5 years", "10 years", "Lifetime"], ans: 3 },
+                    { q: "What is the most critical environmental nursing intervention for a patient with tetanus?", options: ["Keep the room brightly lit to observe for cyanosis", "Provide continuous background music to soothe the patient", "Keep the room dark and completely quiet", "Encourage frequent visitors to keep the patient awake"], ans: 2 },
+                    { q: "What is the purpose of administering Tetanus Immune Globulin (TIG)?", options: ["To kill the Clostridium tetani bacteria", "To reverse spasms that are already occurring", "To neutralize unbound toxin circulating in the blood", "To relax the muscles directly"], ans: 2 },
+                    { q: "Which piece of emergency equipment MUST be kept at the bedside of a tetanus patient?", options: ["Defibrillator", "Tracheostomy tray and suction", "Hemodialysis machine", "Chest tube kit"], ans: 1 },
+                    { q: "When should the FIRST dose of Maternal Tetanus Toxoid (TT 1) be administered?", options: ["Before conception", "As early as possible in pregnancy", "During the third trimester", "Immediately after delivery"], ans: 1 },
+                    { q: "What percentage of protection is conferred to a mother who has completed TT 3?", options: ["50%", "80%", "95%", "99%"], ans: 2 },
+                    { q: "Which antibiotic is commonly prescribed to destroy the vegetative C. tetani bacteria?", options: ["Metronidazole or Penicillin", "Gentamicin", "Ciprofloxacin", "Azithromycin"], ans: 0 },
+                    { q: "Why is it important to group or 'cluster' nursing interventions for a tetanus patient?", options: ["To save time for the nurse", "To minimize touching and disturbing the patient, which triggers spasms", "Because the patient is highly infectious", "To allow the patient to watch TV"], ans: 1 },
+                    { q: "Does Tetanus Immune Globulin (TIG) reverse the effects of the toxin that has already attached to nerve endings?", options: ["Yes, immediately", "Yes, within 24 hours", "No, it only neutralizes unbound circulating toxin", "No, TIG is only for bacterial eradication"], ans: 2 }
+                ]
+            }
+        };
+
+        // Dynamically Generate the Final 50-Item Quiz
+        const extraFinalQuestions = [
+            { q: "A patient with tetanus requires mechanical ventilation. This is most likely necessitated by:", options: ["Severe pulmonary edema", "Laryngospasm and diaphragmatic failure", "Bacterial pneumonia", "Hypovolemic shock"], ans: 1 },
+            { q: "Maternal TT vaccination protects the newborn primarily through:", options: ["IgM antibodies in breastmilk", "IgG antibodies crossing the placenta", "Direct fetal vaccination", "Preventing the mother from getting cut"], ans: 1 },
+            { q: "A rusted nail is a classic cause of tetanus primarily because:", options: ["Rust itself contains the neurotoxin", "It creates a deep, anaerobic puncture wound where spores can thrive", "The metal rust cuts nerves directly", "Rusty nails carry the live, vegetative bacteria"], ans: 1 },
+            { q: "Tetanus spores are known to be highly resistant to:", options: ["Freezing only", "Boiling and standard disinfectants", "Antibiotics in the soil", "Sunlight only"], ans: 1 },
+            { q: "A 5-day-old neonate presents with a refusal to feed, stiffness, and facial grimacing. The PHN strongly suspects:", options: ["Neonatal sepsis", "Congenital syphilis", "Neonatal tetanus", "Meningitis"], ans: 2 },
+            { q: "Which of the following wound types has the LOWEST risk for developing tetanus?", options: ["A superficial, clean scrape", "A severe burn", "A crush injury", "A deep animal bite"], ans: 0 },
+            { q: "The nurse is administering Diazepam (Valium) to a tetanus patient. The primary therapeutic goal is to:", options: ["Lower the heart rate", "Cure the infection", "Raise the seizure threshold and relax muscles", "Neutralize the toxin"], ans: 2 },
+            { q: "The incubation period of tetanus is often clinically associated with:", options: ["The patient's age", "The distance of the injury from the central nervous system", "The patient's blood type", "The time of day the injury occurred"], ans: 1 },
+            { q: "A pregnant woman receives her TT 4 dose. How long is she protected from tetanus?", options: ["1 year", "3 years", "5 years", "10 years"], ans: 3 },
+            { q: "In the management of tetanus, what is the specific role of Penicillin?", options: ["To neutralize the tetanospasmin toxin", "To relax the masseter muscle", "To eradicate the vegetative C. tetani bacteria", "To prevent allergic reactions to TIG"], ans: 2 }
+        ];
+
+        quizzes['final_quiz'] = {
+            title: 'Final Comprehensive 50-Item Exam',
+            next: null,
+            questions: [
+                ...quizzes['intro'].questions,
+                ...quizzes['clinical'].questions,
+                ...quizzes['complications'].questions,
+                ...quizzes['prevention'].questions,
+                ...extraFinalQuestions
+            ]
+        };
+
+        function unlockFirstSection() {
+            if(!unlockedSections.includes('intro')) {
+                unlockedSections.push('intro');
+                updateSidebarUI();
+            }
+            showSection('intro');
+        }
+
+        // Navigation
+        function showSection(sectionId) {
+            if (!unlockedSections.includes(sectionId) && sectionId !== 'home') {
+                alert("Please pass the quiz at the end of the previous section to unlock this content.");
+                return;
+            }
+
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            
+            const target = document.getElementById(sectionId);
+            if(target) {
+                target.classList.remove('hidden');
+                target.classList.add('block');
+            }
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-theme-light', 'text-theme-dark', 'border-r-4', 'border-theme-dark');
+                btn.classList.add('text-slate-600');
+            });
+
+            const activeBtn = document.getElementById('btn-' + sectionId);
+            if(activeBtn) {
+                activeBtn.classList.remove('text-slate-600');
+                activeBtn.classList.add('bg-theme-light', 'text-theme-dark', 'border-r-4', 'border-theme-dark');
+            }
+
+            if(window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('hidden');
+                document.getElementById('sidebar').classList.remove('flex', 'absolute', 'h-full', 'z-50');
+            }
+            
+            document.querySelector('main').scrollTop = 0;
+        }
+
+        function updateSidebarUI() {
+            const sections = ['home', 'intro', 'clinical', 'complications', 'prevention', 'final_quiz_sec'];
+            sections.forEach(sec => {
+                const btn = document.getElementById('btn-' + sec);
+                if (!btn) return;
+                
+                const lockIcon = btn.querySelector('.fa-lock');
+                const mainIcon = btn.querySelector('.nav-icon');
+
+                if (unlockedSections.includes(sec) || sec === 'home') {
+                    btn.classList.remove('locked-section');
+                    if (lockIcon) lockIcon.classList.add('hidden');
+                    if (mainIcon) mainIcon.classList.remove('hidden');
+                } else {
+                    btn.classList.add('locked-section');
+                    if (lockIcon) lockIcon.classList.remove('hidden');
+                    if (mainIcon) mainIcon.classList.add('hidden');
+                }
+            });
+        }
+
+        let currentQuizSection = null;
+
+        // Quiz Handling
+        function openQuiz(sectionId) {
+            currentQuizSection = sectionId;
+            const qData = quizzes[sectionId];
+            if(!qData) return;
+            
+            document.getElementById('quiz-title').innerText = qData.title;
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            
+            qData.questions.forEach((q, index) => {
+                let html = `<div class="bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <p class="font-bold text-slate-800 mb-3 text-lg">${index + 1}. ${q.q}</p>
+                    <div class="space-y-2">`;
+                q.options.forEach((opt, oIndex) => {
+                    html += `<label class="flex items-start space-x-3 p-3 rounded-lg border border-transparent hover:border-amber-500 hover:bg-amber-50 cursor-pointer transition-colors">
+                        <input type="radio" name="q${index}" value="${oIndex}" class="form-radio text-amber-600 focus:ring-amber-500 h-5 w-5 mt-0.5">
+                        <span class="text-slate-700 font-medium">${opt}</span>
+                    </label>`;
+                });
+                html += `</div></div>`;
+                container.innerHTML += html;
+            });
+            
+            document.getElementById('quiz-submit-btn').classList.remove('hidden');
+            document.getElementById('quiz-result-container').classList.add('hidden');
+            document.getElementById('quiz-modal').classList.remove('hidden');
+        }
+
+        function closeQuiz() {
+            document.getElementById('quiz-modal').classList.add('hidden');
+        }
+
+        function submitQuiz() {
+            const qData = quizzes[currentQuizSection];
+            let score = 0;
+            
+            for(let i=0; i<qData.questions.length; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if(selected && parseInt(selected.value) === qData.questions[i].ans) {
+                    score++;
+                }
+            }
+            
+            const percentage = (score / qData.questions.length) * 100;
+            const resultContainer = document.getElementById('quiz-result-container');
+            const submitBtn = document.getElementById('quiz-submit-btn');
+            
+            submitBtn.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+            
+            if(percentage >= 80) {
+                if (currentQuizSection === 'final_quiz') {
+                    resultContainer.innerHTML = `
+                        <div class="text-amber-500 mb-4 animate-bounce"><i class="fa-solid fa-trophy text-6xl drop-shadow-md"></i></div>
+                        <h3 class="text-3xl font-black text-slate-800">Module Mastered!</h3>
+                        <p class="text-xl font-bold text-slate-600 mt-2">You scored ${score}/${qData.questions.length} (${percentage}%)</p>
+                        <p class="text-amber-700 mt-3 font-medium bg-amber-50 py-2 rounded-lg border border-amber-200">You are ready to tackle Tetanus questions on the board exam!</p>
+                        <button onclick="closeQuiz()" class="mt-6 w-full bg-slate-800 text-white font-black py-4 rounded-xl hover:bg-slate-900 shadow-md text-lg transition-transform hover:scale-[1.02]">Close Exam</button>
+                    `;
+                    return;
+                }
+
+                if(qData.next && !unlockedSections.includes(qData.next)) {
+                    unlockedSections.push(qData.next);
+                    updateSidebarUI(); 
+                }
+                
+                let btnAction = `<button onclick="closeQuiz(); showSection('${qData.next}')" class="mt-6 w-full bg-amber-600 text-white font-black py-4 rounded-xl hover:bg-amber-700 shadow-md text-lg transition-transform hover:scale-[1.02]">Proceed to Next Section <i class="fa-solid fa-arrow-right ml-2"></i></button>`;
+                
+                resultContainer.innerHTML = `
+                    <div class="text-emerald-500 mb-4 animate-bounce"><i class="fa-solid fa-circle-check text-6xl drop-shadow-md"></i></div>
+                    <h3 class="text-3xl font-black text-slate-800">Passed!</h3>
+                    <p class="text-xl font-bold text-slate-600 mt-2">You scored ${score}/${qData.questions.length} (${percentage}%)</p>
+                    <p class="text-emerald-700 mt-3 font-medium bg-emerald-50 py-2 rounded-lg border border-emerald-200">Great job. You have unlocked the next section.</p>
+                    ${btnAction}
+                `;
+            } else {
+                resultContainer.innerHTML = `
+                    <div class="text-red-500 mb-4"><i class="fa-solid fa-circle-xmark text-6xl drop-shadow-md"></i></div>
+                    <h3 class="text-3xl font-black text-slate-800">Try Again</h3>
+                    <p class="text-xl font-bold text-slate-600 mt-2">You scored ${score}/${qData.questions.length} (${percentage}%)</p>
+                    <p class="text-red-700 mt-3 font-medium bg-red-50 py-2 rounded-lg border border-red-200">You need at least 80% to proceed. Please review the material and try again.</p>
+                    <button onclick="openQuiz('${currentQuizSection}')" class="mt-6 w-full bg-slate-200 text-slate-800 font-black py-4 rounded-xl hover:bg-slate-300 shadow-md text-lg transition-colors"><i class="fa-solid fa-rotate-right mr-2"></i> Retake Quiz</button>
+                `;
+            }
+        }
+
+        // Mobile Menu
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar.classList.contains('hidden')) {
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('flex', 'absolute', 'h-full', 'z-50');
+            } else {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('flex', 'absolute', 'h-full', 'z-50');
+            }
+        }
+
+        // Active Recall
+        let recallModeActive = false;
+        function toggleRecallMode() {
+            recallModeActive = !recallModeActive;
+            const toggle = document.getElementById('recall-toggle');
+            const knob = document.getElementById('recall-knob');
+            const revealTexts = document.querySelectorAll('.reveal-text');
+
+            if (recallModeActive) {
+                toggle.classList.remove('bg-slate-300');
+                toggle.classList.add('bg-theme-dark');
+                knob.classList.add('translate-x-6');
+                document.body.classList.add('recall-mode');
+                revealTexts.forEach(el => el.classList.remove('revealed'));
+            } else {
+                toggle.classList.add('bg-slate-300');
+                toggle.classList.remove('bg-theme-dark');
+                knob.classList.remove('translate-x-6');
+                document.body.classList.remove('recall-mode');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.reveal-text').forEach(item => {
+                item.addEventListener('click', function() {
+                    if (recallModeActive) {
+                        this.classList.toggle('revealed');
+                    }
+                });
+            });
+            updateSidebarUI();
+        });
+    </script>
+</body>
+</html>
